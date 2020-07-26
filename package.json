@@ -19,10 +19,17 @@
 			{
 				"command": "vscode-extension-yuque.helloWorld",
 				"title": "Hello World"
+			},
+			{
+				"command": "yuque.addDoc",
+				"title": "Add",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				}
 			}
 		],
-		"viewsWelcome": [
-		],
+		"viewsWelcome": [],
 		"views": {
 			"yuque": [
 				{
@@ -52,7 +59,14 @@
 			"view/title": [
 				{
 					"command": "yuque.changeRepoType",
-					"when": "view == repos"
+					"when": "view == yuque"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "yuque.addDoc",
+					"group": "inline",
+					"when": "view == repos-book && viewItem == repo"
 				}
 			]
 		},
@@ -94,6 +108,9 @@
 		"vscode-test": "^1.3.0"
 	},
 	"dependencies": {
-		"axios": "^0.19.2"
+		"@types/cheerio": "^0.22.21",
+		"axios": "^0.19.2",
+		"cheerio": "^1.0.0-rc.3",
+		"parcel-bundler": "^1.12.4"
 	}
 }

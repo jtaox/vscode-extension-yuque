@@ -67,6 +67,8 @@ class Serializer extends vscode.TreeItem {
 		if (type === "doc") {
 			this.command = this.getDocCommand(this.serializer as DocType);
 		}
+
+		this.contextValue = type;
 	}
 
 	getDocCommand(docElement: DocType): vscode.Command {
