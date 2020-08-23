@@ -1,5 +1,6 @@
 import YuQue from "./api/YuQue";
 import BaseYqConfig from "./config"
+import { CrateDocParam, UpdateDocParam } from "./types"
 
 type YuqueVscConfig = {
   token: string
@@ -9,15 +10,6 @@ type YuqueVscConfig = {
 type DocInfoParam = {
   repoId: string
   slug: string
-}
-
-type UpdateDocParam = {
-  repoId: number
-  slug: string,
-  id: number,
-  title: string,
-  public: 0 | 1,
-  body: string
 }
 
 
@@ -42,8 +34,18 @@ class YuqueVSC {
     return this.yuque.Doc.get(Number(params.repoId), params.slug)
   }
 
+  public createDoc(params: CrateDocParam) {
+    return this.yuque.Doc.create(params);
+  }
+
   public updateDoc(params: UpdateDocParam) {
     return this.yuque.Doc.update(params);
+  }
+  
+  public getRepo() {
+    return this.yuque.Repo.list({
+      type: "Book"
+    })
   }
 }
 

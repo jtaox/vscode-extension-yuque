@@ -1,11 +1,18 @@
 import Requestable from "./Requestable";
 import { AuthInfo, Doc as DocType } from "./types";
 
-type UpdateDocParam = {
+export type UpdateDocParam = {
   repoId: number
   slug: string,
   id: number,
   title: string,
+  public: 0 | 1,
+  body: string
+}
+
+export type CrateDocParam = {
+  repoId: number 
+  title: string 
   public: 0 | 1,
   body: string
 }
@@ -33,6 +40,16 @@ class Doc extends Requestable {
     return this.request<DocType>("PUT", path, {
       title,
       slug,
+      public: publicParam,
+      body
+    })
+  }
+
+  create(params: CrateDocParam) {
+    const { repoId, title, public: publicParam, body } = params;
+    const path: string = `/repos/${repoId}/docs`
+    return this.request<DocType>("POST", path, {
+      title,
       public: publicParam,
       body
     })

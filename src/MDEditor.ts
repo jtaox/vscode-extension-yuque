@@ -94,9 +94,7 @@ class MDEditor implements vscode.CustomTextEditorProvider {
   // write doc to a given document
   private updateTextDocument(document: vscode.TextDocument, content: string) {
     const edit = new vscode.WorkspaceEdit();
-    
-    edit.replace(document.uri, new vscode.Range(0, 0, document.lineCount, 0),
-    content)
+    edit.replace(document.uri, new vscode.Range(0, 0, document.lineCount, 0), content)
 
     return vscode.workspace.applyEdit(edit);
   }

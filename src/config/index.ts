@@ -21,7 +21,7 @@ class YqExtConfig {
     this.readDefaultConfig()
   }
 
-  readDefaultConfig(): void {
+  private readDefaultConfig(): void {
     const { token, login } = vscode.workspace.getConfiguration("yuque");
 
     this.baseConfig = {

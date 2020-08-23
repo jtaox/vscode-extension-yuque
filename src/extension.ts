@@ -4,23 +4,20 @@ import * as vscode from "vscode";
 import { RepoProvider } from "./provider/RepoProvider";
 import YuQue from "./api/YuQue";
 import { Doc } from "./types";
-import * as path from "path";
-import * as fs from "fs";
-import { tagHandler } from "./helper/template";
 import MDEditor from "./MDEditor";
 import YuqueVSC from "./YuqueVSC";
 import MDFileSystem from "./MDFileSystem"
-import { URL } from "url";
-import querystring from "querystring";
+
+import { showRepoPick, showDocTitleInputBox, parseYuqueUri, buildYuqueUri, showProgress, showInfoMessage } from "./helper"
 
 class YuquerTextDocumentContentProvider implements vscode.TextDocumentContentProvider {
   onDidChange?: vscode.Event<vscode.Uri> | undefined 
   provideTextDocumentContent(uri: vscode.Uri, token: vscode.CancellationToken): vscode.ProviderResult<string> {
-    const { respId, slug } = querystring.decode(uri.query);
+    const { repo, slug } = parseYuqueUri(uri)
     
 
     return YuqueVSC.getInstance().getDoc({
-      repoId: respId as string,
+      repoId: repo as string,
       slug: slug as string
     }).then(result => {
       const { body } = result.data
@@ -46,19 +43,26 @@ export function activate(context: vscode.ExtensionContext) {
     console.log("onDidSaveTextDocument")
   })
 
-
   // vscode.workspace.registerTextDocumentContentProvider("yuque", new YuquerTextDocumentContentProvider())
   // vscode.workspace.registerFileSystemProvider("yuque", new YuqueFileSystemProvider())
 
   const { token, login } = vscode.workspace.getConfiguration("yuque");
   const yuque = new YuQue({ token, login });
 
+  const repoProvider = new RepoProvider("Book", yuque)
+
+
+
   vscode.commands.registerCommand("yuque.openDoc", async (doc: Doc) => {
     // yuque.Doc.get(doc.__repoId, doc.slug).then(async (res) => {
       // vscode.workspace.openTextDocument(vscode.Uri.parse("yuque://abcyuque"))
-
-      const url = `yuque://abc/def.yuque?respId=${doc.__repoId}&slug=${doc.slug}&docId=${doc.id}&title=${doc.title}`;
-      await vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url));
+      const uri = buildYuqueUri({
+        repo: String(doc.__repoId),
+        slug: doc.slug,
+        docId: doc.id,
+        title: doc.title
+      })
+      await vscode.commands.executeCommand('vscode.open', uri);
 
       // const panel = vscode.window.createWebviewPanel(
       //   "Yuque Doc",
@@ -106,7 +110,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   vscode.window.registerTreeDataProvider(
     "repos-book",
-    new RepoProvider("Book", yuque)
+    repoProvider
   );
 
   vscode.commands.registerCommand(
@@ -117,9 +121,37 @@ export function activate(context: vscode.ExtensionContext) {
 
   vscode.commands.registerCommand(
     "yuque.addDocFromRepo",
-    () => {
-      console.log("addDocFromRepo")
-    }
+    async () => {
+
+      showProgress<string | void>("请按步骤创建文档", async done => {
+        const selection =  await showRepoPick()
+
+        const close = () => done()
+
+        if (!selection) return close();
+
+        done(`文档存放仓库: ${selection.label}`, 33)
+
+        const title = await showDocTitleInputBox()
+
+        if (!title?.trim()) return close()
+
+        done(`文档名: ${title}`, 33)
+        
+        return YuqueVSC.getInstance().createDoc({
+          repoId: selection._raw.id,
+          title,
+          public: 0,
+          body: ""
+        }).then(res => {
+          repoProvider.refresh()
+          done()
+          return res.data.title;
+        })
+
+      }).then(title => {
+        title && showInfoMessage(`【${title}】创建成功`)
+      })
   )
 
   // Use the console to output diagnostic information (console.log) and errors (console.error)

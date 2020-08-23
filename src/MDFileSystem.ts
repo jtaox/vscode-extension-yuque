@@ -5,6 +5,7 @@ import querystring from "querystring";
 
 import YuqueVSC from "./YuqueVSC";
 import YuqueEventTower from "./YuqueEventTower";
+import { parseYuqueUri, showProgress, showInfoMessage } from "./helper";
 
 class MDFileSystem implements vscode.FileSystemProvider {
 
@@ -22,10 +23,7 @@ class MDFileSystem implements vscode.FileSystemProvider {
     const dispose = YuqueEventTower.getIns().onDidChangeFile((evt) => {
 
       this._onDidChangeFile.fire([
-        {
-          uri: evt.uri,
-          type: evt.type
-        } as vscode.FileChangeEvent
+        evt
       ])
     })
 
@@ -34,17 +32,17 @@ class MDFileSystem implements vscode.FileSystemProvider {
     } };
   }
   stat(uri: vscode.Uri): vscode.FileStat | Thenable<vscode.FileStat> {
-    const { respId, slug } = querystring.decode(uri.query);
+    const { repo, slug } = parseYuqueUri(uri);
 
     return YuqueVSC.getInstance().getDoc({
-      repoId: respId as string,
+      repoId: repo as string,
       slug: slug as string
     }).then(result => {
       const { created_at, updated_at, word_count } = result.data
       
       const getTime = (...dates: string[]): number[] => dates.map(date => new Date(date).getTime());
       const stat = new YuqueDocStat(word_count, getTime(created_at, updated_at));
-      console.log(stat, "stat")
+      
       return stat
     })
 
@@ -56,42 +54,37 @@ class MDFileSystem implements vscode.FileSystemProvider {
     throw new Error("Method not implemented.")
   }
   readFile(uri: vscode.Uri): Uint8Array | Thenable<Uint8Array> {
-    const { respId, slug } = querystring.decode(uri.query);
+    const { repo, slug } = parseYuqueUri(uri);
+
     return YuqueVSC.getInstance().getDoc({
-      repoId: respId as string,
+      repoId: repo as string,
       slug: slug as string
     }).then(result => {
       const { body } = result.data
       // string to Uint8Array
-      const conent = body + Date.now() || ""
-      console.log("获取yuque", conent, result.data)
-      return new TextEncoder().encode(conent);
+      return new TextEncoder().encode(body);
     })
   }
   writeFile(uri: vscode.Uri, content: Uint8Array, options: { create: boolean; overwrite: boolean }): void | Thenable<void> {
-    const { respId, slug, docId, title } = querystring.decode(uri.query);
-    console.log("save start", uri, new TextDecoder("utf-8").decode(content), options, "save end")
-    console.log({
-      title: title as string,
-      slug: slug as string,
-      public: 1,
-      body: new TextDecoder("utf-8").decode(content),
-      id: Number(docId),
-      repoId: Number(respId)
-    })
-    return YuqueVSC.getInstance().updateDoc({
-      title: title as string,
-      slug: slug as string,
-      public: 1,
-      body: new TextDecoder("utf-8").decode(content),
-      id: Number(docId),
-      repoId: Number(respId)
-    }).then(result => {
-      console.log("update complete", result.data)
+    const { repo, slug, query: { title, docId } } = parseYuqueUri(uri);
+
+    showProgress<string>("正在保存文档", (done) => {
+      return YuqueVSC.getInstance().updateDoc({
+        title: title as string,
+        slug: slug as string,
+        public: 1,
+        body: new TextDecoder("utf-8").decode(content),
+        id: Number(docId),
+        repoId: Number(repo)
+      }).then(result => {
+        done();
+        return result.data.title;
+      })
+    }).then(title => {
+      showInfoMessage(`${title}保存成功~`)
     })
   }
   delete(uri: vscode.Uri, options: { recursive: boolean }): void | Thenable<void> {
-    console.log("readDirectory delete")
     throw new Error("Method not implemented.")
   }
   rename(oldUri: vscode.Uri, newUri: vscode.Uri, options: { overwrite: boolean }): void | Thenable<void> {

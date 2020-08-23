@@ -1,13 +1,19 @@
 import * as vscode from 'vscode';
 import YuQue from "../api/YuQue"
-import { AuthInfo, Repo as RepoType, Doc as DocType } from '../types';
-import Doc from '../api/Doc';
+import {  Repo as RepoType, Doc as DocType } from '../types';
 
 export class RepoProvider implements vscode.TreeDataProvider<Serializer> {
 
 	constructor(private type: string, private yuque: YuQue) {
 	}
-	onDidChangeTreeData?: vscode.Event<any> | undefined;
+
+	
+	private _onDidChangeTreeData: vscode.EventEmitter<Serializer | undefined> = new vscode.EventEmitter<Serializer | undefined>();
+  readonly onDidChangeTreeData: vscode.Event<Serializer | undefined> = this._onDidChangeTreeData.event;
+
+  refresh(): void {
+    this._onDidChangeTreeData.fire(undefined);
+  }
 
 	getTreeItem(element: any): vscode.TreeItem | Thenable<vscode.TreeItem> {
 		return element;
