@@ -27,6 +27,22 @@
 					"light": "resources/light/add.svg",
 					"dark": "resources/dark/add.svg"
 				}
+			},
+			{
+				"command": "yuque.addDoc",
+				"title": "Add",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				}
+			},
+			{
+				"command": "yuque.addDocFromRepo",
+				"title": "Add",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				}
 			}
 		],
 		"viewsWelcome": [],
@@ -60,6 +76,10 @@
 				{
 					"command": "yuque.changeRepoType",
 					"when": "view == yuque"
+				},
+				{
+					"command": "yuque.addDocFromRepo",
+					"group": "navigation"
 				}
 			],
 			"view/item/context": [
@@ -84,7 +104,19 @@
 					"description": "Yuque login"
 				}
 			}
-		}
+		},
+		"customEditors": [
+			{
+				"viewType": "yuque",
+				"displayName": "yuque display name",
+				"selector": [
+					{
+						"filenamePattern": "*.yuque"
+					}
+				],
+				"priority": "default"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

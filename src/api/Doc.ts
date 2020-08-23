@@ -1,6 +1,15 @@
 import Requestable from "./Requestable";
 import { AuthInfo, Doc as DocType } from "./types";
 
+type UpdateDocParam = {
+  repoId: number
+  slug: string,
+  id: number,
+  title: string,
+  public: 0 | 1,
+  body: string
+}
+
 class Doc extends Requestable {
   constructor(authInfo: AuthInfo) {
     super(authInfo);
@@ -15,6 +24,17 @@ class Doc extends Requestable {
     const path: string = `/repos/${repoId}/docs/${slug}`
     return this.request<DocType>("get", path, {
       raw: 1
+    })
+  }
+
+  update(params: UpdateDocParam) {
+    const { repoId, id, title, slug, public: publicParam, body } = params;
+    const path: string = `/repos/${repoId}/docs/${id}`
+    return this.request<DocType>("PUT", path, {
+      title,
+      slug,
+      public: publicParam,
+      body
     })
   }
 

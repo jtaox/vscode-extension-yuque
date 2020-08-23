@@ -4,6 +4,9 @@ export type Doc = {
   slug: string,
   body_html: string,
   body: string,
+  created_at: string,
+  updated_at: string,
+  word_count: number,
   __repoId: number
 }
 

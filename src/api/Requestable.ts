@@ -28,6 +28,8 @@ class Requestable {
       if (res.status === 200) {
         return res.data;
       }
+    }).catch(er => {
+      console.log(er, path)
     })
   }
 }

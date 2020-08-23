@@ -7,57 +7,101 @@ import { Doc } from "./types";
 import * as path from "path";
 import * as fs from "fs";
 import { tagHandler } from "./helper/template";
+import MDEditor from "./MDEditor";
+import YuqueVSC from "./YuqueVSC";
+import MDFileSystem from "./MDFileSystem"
+import { URL } from "url";
+import querystring from "querystring";
+
+class YuquerTextDocumentContentProvider implements vscode.TextDocumentContentProvider {
+  onDidChange?: vscode.Event<vscode.Uri> | undefined 
+  provideTextDocumentContent(uri: vscode.Uri, token: vscode.CancellationToken): vscode.ProviderResult<string> {
+    const { respId, slug } = querystring.decode(uri.query);
+    
+
+    return YuqueVSC.getInstance().getDoc({
+      repoId: respId as string,
+      slug: slug as string
+    }).then(result => {
+      const { body } = result.data
+
+      return body;
+    })
+  }
+  
+}
+
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+  context.subscriptions.push(MDEditor.register(context));
+  MDFileSystem.register();
+
+  vscode.workspace.onWillSaveTextDocument((evt) => {
+    console.log('onWillSaveTextDocument')
+  })
+
+  vscode.workspace.onDidSaveTextDocument(() => {
+    console.log("onDidSaveTextDocument")
+  })
+
+
+  // vscode.workspace.registerTextDocumentContentProvider("yuque", new YuquerTextDocumentContentProvider())
+  // vscode.workspace.registerFileSystemProvider("yuque", new YuqueFileSystemProvider())
+
   const { token, login } = vscode.workspace.getConfiguration("yuque");
   const yuque = new YuQue({ token, login });
 
-  vscode.commands.registerCommand("yuque.openDoc", (doc: Doc) => {
-    yuque.Doc.get(doc.__repoId, doc.slug).then(async (res) => {
-      const panel = vscode.window.createWebviewPanel(
-        "Yuque Doc",
-        res.data.title,
-        {
-          preserveFocus: true,
-          viewColumn: vscode.ViewColumn.One,
-        },
-        {
-          enableScripts: true,
-        }
-      );
+  vscode.commands.registerCommand("yuque.openDoc", async (doc: Doc) => {
+    // yuque.Doc.get(doc.__repoId, doc.slug).then(async (res) => {
+      // vscode.workspace.openTextDocument(vscode.Uri.parse("yuque://abcyuque"))
 
-      const filePath: vscode.Uri = vscode.Uri.file(
-        path.join(context.extensionPath, "src", "editor", "dist", "index.html")
-      );
-      const templateContent = fs.readFileSync(filePath.fsPath, "utf8");
+      const url = `yuque://abc/def.yuque?respId=${doc.__repoId}&slug=${doc.slug}&docId=${doc.id}&title=${doc.title}`;
+      await vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url));
 
-      const html = tagHandler(
-        panel.webview,
-        templateContent,
-        context.extensionPath
-      );
+      // const panel = vscode.window.createWebviewPanel(
+      //   "Yuque Doc",
+      //   res.data.title,
+      //   {
+      //     preserveFocus: true,
+      //     viewColumn: vscode.ViewColumn.One,
+      //   },
+      //   {
+      //     enableScripts: true,
+      //   }
+      // );
 
-      panel.webview.postMessage({
-        command: "vscBaseMarkdown.setContent",
-        payload: res.data.body,
-      });
-      panel.webview.onDidReceiveMessage(
-        (message) => {
-          switch (message.command) {
-            case "vscBaseMarkdown.mounted":
-              console.log("vscBaseMarkdown.mounted");
-              return;
-          }
-        },
-        undefined,
-        context.subscriptions
-      );
+      // const filePath: vscode.Uri = vscode.Uri.file(
+      //   path.join(context.extensionPath, "src", "editor", "dist", "index.html")
+      // );
+      // const templateContent = fs.readFileSync(filePath.fsPath, "utf8");
 
-      // And set its HTML content
-      panel.webview.html = html;
-    });
+      // const html = tagHandler(
+      //   panel.webview,
+      //   templateContent,
+      //   context.extensionPath
+      // );
+
+      // panel.webview.postMessage({
+      //   command: "vscBaseMarkdown.setContent",
+      //   payload: res.data.body,
+      // });
+      // panel.webview.onDidReceiveMessage(
+      //   (message) => {
+      //     switch (message.command) {
+      //       case "vscBaseMarkdown.mounted":
+      //         console.log("vscBaseMarkdown.mounted");
+      //         return;
+      //     }
+      //   },
+      //   undefined,
+      //   context.subscriptions
+      // );
+
+      // // And set its HTML content
+      // panel.webview.html = html;
+    // });
   });
 
   vscode.window.registerTreeDataProvider(
@@ -70,6 +114,13 @@ export function activate(context: vscode.ExtensionContext) {
     (...props) =>
       console.log(props)
   );
+
+  vscode.commands.registerCommand(
+    "yuque.addDocFromRepo",
+    () => {
+      console.log("addDocFromRepo")
+    }
+  )
 
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
