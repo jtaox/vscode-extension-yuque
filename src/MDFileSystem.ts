@@ -1,8 +1,6 @@
 import * as vscode from "vscode"
 import { TextEncoder, TextDecoder } from "util";
 
-import querystring from "querystring";
-
 import YuqueVSC from "./YuqueVSC";
 import YuqueEventTower from "./YuqueEventTower";
 import { parseYuqueUri, showProgress, showInfoMessage } from "./helper";
@@ -14,11 +12,11 @@ class MDFileSystem implements vscode.FileSystemProvider {
     constructor() {
         this._onDidChangeFile = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
     }
-  
+
   get onDidChangeFile(): vscode.Event<vscode.FileChangeEvent[]> {
     return this._onDidChangeFile.event;
   }
-  
+
   watch(uri: vscode.Uri, options: { recursive: boolean; excludes: string[] }): vscode.Disposable {
     const dispose = YuqueEventTower.getIns().onDidChangeFile((evt) => {
 
@@ -39,10 +37,10 @@ class MDFileSystem implements vscode.FileSystemProvider {
       slug: slug as string
     }).then(result => {
       const { created_at, updated_at, word_count } = result.data
-      
+
       const getTime = (...dates: string[]): number[] => dates.map(date => new Date(date).getTime());
       const stat = new YuqueDocStat(word_count, getTime(created_at, updated_at));
-      
+
       return stat
     })
 
@@ -56,13 +54,16 @@ class MDFileSystem implements vscode.FileSystemProvider {
   readFile(uri: vscode.Uri): Uint8Array | Thenable<Uint8Array> {
     const { repo, slug } = parseYuqueUri(uri);
 
-    return YuqueVSC.getInstance().getDoc({
-      repoId: repo as string,
-      slug: slug as string
-    }).then(result => {
-      const { body } = result.data
-      // string to Uint8Array
-      return new TextEncoder().encode(body);
+    return showProgress<Uint8Array>("正在打开文档", (done) => {
+      return YuqueVSC.getInstance().getDoc({
+        repoId: repo as string,
+        slug: slug as string
+      }).then(result => {
+        done()
+        const { body } = result.data
+        // string to Uint8Array
+        return new TextEncoder().encode(body);
+      })
     })
   }
   writeFile(uri: vscode.Uri, content: Uint8Array, options: { create: boolean; overwrite: boolean }): void | Thenable<void> {
