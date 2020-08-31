@@ -8,10 +8,13 @@ import { parseYuqueUri, showProgress, showInfoMessage } from "./helper";
 class MDFileSystem implements vscode.FileSystemProvider {
 
   private _onDidChangeFile: vscode.EventEmitter<vscode.FileChangeEvent[]>;
+  private mStatusBar: vscode.StatusBarItem;
 
-    constructor() {
-        this._onDidChangeFile = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
-    }
+  constructor() {
+      this._onDidChangeFile = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
+
+      this.mStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 999);
+  }
 
   get onDidChangeFile(): vscode.Event<vscode.FileChangeEvent[]> {
     return this._onDidChangeFile.event;
@@ -51,39 +54,50 @@ class MDFileSystem implements vscode.FileSystemProvider {
   createDirectory(uri: vscode.Uri): void | Thenable<void> {
     throw new Error("Method not implemented.")
   }
+
+  showStatusBarInfo<T>(text: string, hideWhenDone: Thenable<T>): Thenable<T> {
+    this.mStatusBar.text = text;
+    this.mStatusBar.show()
+
+    return hideWhenDone.then(value => {
+      this.mStatusBar.hide()
+
+      return value;
+    })
+  }
+
   readFile(uri: vscode.Uri): Uint8Array | Thenable<Uint8Array> {
     const { repo, slug } = parseYuqueUri(uri);
 
-    return showProgress<Uint8Array>("正在打开文档", (done) => {
-      return YuqueVSC.getInstance().getDoc({
-        repoId: repo as string,
-        slug: slug as string
-      }).then(result => {
-        done()
-        const { body } = result.data
-        // string to Uint8Array
-        return new TextEncoder().encode(body);
-      })
-    })
+    return this.showStatusBarInfo("reading yuque doc...", YuqueVSC.getInstance().getDoc({
+      repoId: repo as string,
+      slug: slug as string
+    }).then(result => {
+      const { body } = result.data
+      // string to Uint8Array
+      return new TextEncoder().encode(body);
+    }))
+
   }
   writeFile(uri: vscode.Uri, content: Uint8Array, options: { create: boolean; overwrite: boolean }): void | Thenable<void> {
     const { repo, slug, query: { title, docId } } = parseYuqueUri(uri);
 
-    showProgress<string>("正在保存文档", (done) => {
-      return YuqueVSC.getInstance().updateDoc({
-        title: title as string,
-        slug: slug as string,
-        public: 1,
-        body: new TextDecoder("utf-8").decode(content),
-        id: Number(docId),
-        repoId: Number(repo)
-      }).then(result => {
-        done();
-        return result.data.title;
-      })
+    this.mStatusBar.show();
+
+    this.showStatusBarInfo<void>("saving yuque doc...", YuqueVSC.getInstance().updateDoc({
+      title: title as string,
+      slug: slug as string,
+      public: 1,
+      body: new TextDecoder("utf-8").decode(content),
+      id: Number(docId),
+      repoId: Number(repo)
+    }).then(result => {
+      this.mStatusBar.hide()
+
+      return result.data.title;
     }).then(title => {
       showInfoMessage(`${title}保存成功~`)
-    })
+    }))
   }
   delete(uri: vscode.Uri, options: { recursive: boolean }): void | Thenable<void> {
     throw new Error("Method not implemented.")
