@@ -4,7 +4,7 @@ import qs from "querystring";
 import YqExtConfig from "./../config";
 // yuque://abc/def.yuque?respId=${doc.__repoId}&slug=${doc.slug}&docId=${doc.id}&title=${doc.title}`;
 const YUQUE_SCHEMA = "yuque";
-const YUQUE_SUFFIX = "yuque";
+const YUQUE_SUFFIX = "md";
 
 const YUQUE_LOGIN = YqExtConfig.getInstance().getBaseConfig().login;
 
@@ -52,7 +52,7 @@ export const buildYuqueUri = (params: YuqueUriParam) => {
 export const parseYuqueUri = (uri: vscode.Uri): YuqueUriParseResult => {
   const query = (qs.parse(uri.query) || {}) as YuqueUriParseQueryResult;
 
-  const pathFragmeng = uri.path.replace(/\.yuque$/, "").split('/')
+  const pathFragmeng = uri.path.replace(/(\.yuque|\.md)$/, "").split('/')
   pathFragmeng.shift()
 
   const [repo, slug] = pathFragmeng;
