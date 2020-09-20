@@ -34,7 +34,7 @@ class MDFileSystem implements vscode.FileSystemProvider {
   }
   stat(uri: vscode.Uri): vscode.FileStat | Thenable<vscode.FileStat> {
     const { repo, slug } = parseYuqueUri(uri);
-
+    console.log("stat", repo, slug, uri, uri.toString())
     return YuqueVSC.getInstance().getDoc({
       repoId: repo as string,
       slug: slug as string
@@ -49,6 +49,7 @@ class MDFileSystem implements vscode.FileSystemProvider {
 
   }
   readDirectory(uri: vscode.Uri): [string, vscode.FileType][] | Thenable<[string, vscode.FileType][]> {
+    console.log("readDirectory")
     throw new Error("Method not implemented.")
   }
   createDirectory(uri: vscode.Uri): void | Thenable<void> {
@@ -68,7 +69,7 @@ class MDFileSystem implements vscode.FileSystemProvider {
 
   readFile(uri: vscode.Uri): Uint8Array | Thenable<Uint8Array> {
     const { repo, slug } = parseYuqueUri(uri);
-
+    console.log("readFile")
     return this.showStatusBarInfo("reading yuque doc...", YuqueVSC.getInstance().getDoc({
       repoId: repo as string,
       slug: slug as string
@@ -96,7 +97,7 @@ class MDFileSystem implements vscode.FileSystemProvider {
 
       return result.data.title;
     }).then(title => {
-      showInfoMessage(`${title}保存成功~`)
+      showInfoMessage(`保存成功`)
     }))
   }
   delete(uri: vscode.Uri, options: { recursive: boolean }): void | Thenable<void> {
@@ -106,7 +107,8 @@ class MDFileSystem implements vscode.FileSystemProvider {
     throw new Error("Method not implemented.")
   }
   public static register() {
-    vscode.workspace.registerFileSystemProvider("yuque", new MDFileSystem())
+    const fileSystem = new MDFileSystem()
+    vscode.workspace.registerFileSystemProvider("yuque", fileSystem);
   }
 }
 

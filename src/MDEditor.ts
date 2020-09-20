@@ -17,7 +17,7 @@ class MDEditor implements vscode.CustomTextEditorProvider {
   private static readonly viewType = "yuque";
 
   constructor(private readonly context: vscode.ExtensionContext) {
-
+    
   }
 
   resolveCustomTextEditor(

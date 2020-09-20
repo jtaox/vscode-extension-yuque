@@ -12,7 +12,7 @@ export const showProgress = <T> (title: string, asyncFunc: (done: (msg?: string,
         increment = 100
       }
 
-      progress.report({ increment: 100, message });
+      progress.report({ increment, message });
     }
     return asyncFunc(done);
   })

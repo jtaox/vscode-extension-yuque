@@ -43,6 +43,14 @@
 					"light": "resources/light/add.svg",
 					"dark": "resources/dark/add.svg"
 				}
+			},
+			{
+				"command": "yuque.test",
+				"title": "重命名",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				}
 			}
 		],
 		"viewsWelcome": [],
@@ -87,7 +95,15 @@
 					"command": "yuque.addDoc",
 					"group": "inline",
 					"when": "view == repos-book && viewItem == repo"
-				}
+				},
+				{
+					"command": "yuque.test",
+					"when": "view == repos-book && viewItem == repo"
+				},
+				{
+					"command": "yuque.test",
+					"when": "view == repos-book && viewItem == doc"
+        }
 			]
 		},
 		"configuration": {

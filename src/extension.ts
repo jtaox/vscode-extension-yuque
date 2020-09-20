@@ -9,6 +9,7 @@ import YuqueVSC from "./YuqueVSC";
 import MDFileSystem from "./MDFileSystem"
 
 import { showRepoPick, showDocTitleInputBox, parseYuqueUri, buildYuqueUri, showProgress, showInfoMessage } from "./helper"
+import YuqueDocumentSymbolProvider from "./provider/YuqueDocumentSymbolProvider";
 
 class YuquerTextDocumentContentProvider implements vscode.TextDocumentContentProvider {
   onDidChange?: vscode.Event<vscode.Uri> | undefined 
@@ -113,17 +114,27 @@ export function activate(context: vscode.ExtensionContext) {
     repoProvider
   );
 
+
+  // vscode.languages.registerDocumentSymbolProvider({
+  //   scheme: "yuque",
+  //   language: "*"
+  // }, new YuqueDocumentSymbolProvider());
+
   vscode.commands.registerCommand(
     "yuque.addDoc",
     (...props) =>
       console.log(props)
   );
 
+  vscode.commands.registerCommand("yuque.test", () => {
+    console.log('yuque.test')
+  })
+
   vscode.commands.registerCommand(
     "yuque.addDocFromRepo",
     async () => {
 
-      showProgress<string | void>("请按步骤创建文档", async done => {
+      showProgress<string | void>(undefined, async done => {
         const selection =  await showRepoPick()
 
         const close = () => done()

@@ -32,7 +32,7 @@ export const tagHandler = (webview: vscode.Webview, templateContent: string, ext
 
 interface SourceMap {
   [key: string]: vscode.Uri;
-} 
+}
 
 export const getSourceMap = (extensionPath: string) => {
   const sourceMap: SourceMap = {}

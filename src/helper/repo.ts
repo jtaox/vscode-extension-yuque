@@ -18,7 +18,7 @@ export const showRepoPick = (): Thenable<AdvPick | undefined> => {
   })
 
   return vscode.window.showQuickPick(quickPickItem, {
-    placeHolder: "点击选择一个最近参与的知识库"
+    placeHolder: "点击选择一个知识库"
   }).then(selection => {
     if (!selection) {
       return;
