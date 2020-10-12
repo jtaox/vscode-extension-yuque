@@ -6,25 +6,25 @@ import YuQue from "./api/YuQue";
 import { Doc } from "./types";
 import MDEditor from "./MDEditor";
 import YuqueVSC from "./YuqueVSC";
-import MDFileSystem from "./MDFileSystem"
+import MDFileSystem from "./MDFileSystem";
 
-import { showRepoPick, showDocTitleInputBox, parseYuqueUri, buildYuqueUri, showProgress, showInfoMessage } from "./helper"
+import { showRepoPick, showDocTitleInputBox, parseYuqueUri, buildYuqueUri, showProgress, showInfoMessage } from "./helper";
 import YuqueDocumentSymbolProvider from "./provider/YuqueDocumentSymbolProvider";
 
 class YuquerTextDocumentContentProvider implements vscode.TextDocumentContentProvider {
-  onDidChange?: vscode.Event<vscode.Uri> | undefined 
+  onDidChange?: vscode.Event<vscode.Uri> | undefined; 
   provideTextDocumentContent(uri: vscode.Uri, token: vscode.CancellationToken): vscode.ProviderResult<string> {
-    const { repo, slug } = parseYuqueUri(uri)
+    const { repo, slug } = parseYuqueUri(uri);
     
 
     return YuqueVSC.getInstance().getDoc({
       repoId: repo as string,
       slug: slug as string
     }).then(result => {
-      const { body } = result.data
+      const { body } = result.data;
 
       return body;
-    })
+    });
   }
   
 }
@@ -37,12 +37,12 @@ export function activate(context: vscode.ExtensionContext) {
   MDFileSystem.register();
 
   vscode.workspace.onWillSaveTextDocument((evt) => {
-    console.log('onWillSaveTextDocument')
-  })
+    console.log('onWillSaveTextDocument');
+  });
 
   vscode.workspace.onDidSaveTextDocument(() => {
-    console.log("onDidSaveTextDocument")
-  })
+    console.log("onDidSaveTextDocument");
+  });
 
   // vscode.workspace.registerTextDocumentContentProvider("yuque", new YuquerTextDocumentContentProvider())
   // vscode.workspace.registerFileSystemProvider("yuque", new YuqueFileSystemProvider())
@@ -50,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
   const { token, login } = vscode.workspace.getConfiguration("yuque");
   const yuque = new YuQue({ token, login });
 
-  const repoProvider = new RepoProvider("Book", yuque)
+  const repoProvider = new RepoProvider("Book", yuque);
 
 
 
@@ -62,7 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
         slug: doc.slug,
         docId: doc.id,
         title: doc.title
-      })
+      });
       await vscode.commands.executeCommand('vscode.open', uri);
 
       // const panel = vscode.window.createWebviewPanel(
@@ -127,43 +127,44 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   vscode.commands.registerCommand("yuque.test", () => {
-    console.log('yuque.test')
-  })
+    console.log('yuque.test');
+  });
 
   vscode.commands.registerCommand(
     "yuque.addDocFromRepo",
     async () => {
 
       showProgress<string | void>(undefined, async done => {
-        const selection =  await showRepoPick()
+        const selection =  await showRepoPick();
 
-        const close = () => done()
+        const close = () => done();
 
-        if (!selection) return close();
+        if (!selection) {return close();}
 
-        done(`文档存放仓库: ${selection.label}`, 33)
+        done(`文档存放仓库: ${selection.label}`, 33);
 
-        const title = await showDocTitleInputBox()
+        const title = await showDocTitleInputBox();
 
-        if (!title?.trim()) return close()
+        if (!title?.trim()) {return close();};
 
-        done(`文档名: ${title}`, 33)
-        
+        done(`文档名: ${title}`, 33);
+
         return YuqueVSC.getInstance().createDoc({
           repoId: selection._raw.id,
           title,
           public: 0,
           body: ""
         }).then(res => {
-          repoProvider.refresh()
-          done()
+          repoProvider.refresh();
+          done();
           return res.data.title;
-        })
+        });
 
       }).then(title => {
-        title && showInfoMessage(`【${title}】创建成功`)
-      })
-  )
+        title && showInfoMessage(`【${title}】创建成功`);
+      });
+    }
+  );
 
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated

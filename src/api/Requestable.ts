@@ -9,14 +9,14 @@ class Requestable {
       baseURL: this.baseUrl,
       timeout: 1000,
       headers: this.getHeaders()
-    })
+    });
   }
 
   private getHeaders() {
     return {
       "X-Auth-Token": this.authInfo.token,
       "User-Agent": "vsc-extension"
-    }
+    };
   }
 
   request<T>(method: Method, path: string, data: any = {}): AxiosPromise<T> {
@@ -29,9 +29,9 @@ class Requestable {
         return res.data;
       }
     }).catch(er => {
-      console.log(er, path)
-    })
+      console.log(er, path);
+    });
   }
 }
 
-export default Requestable
+export default Requestable;

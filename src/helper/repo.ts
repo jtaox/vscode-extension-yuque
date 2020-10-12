@@ -1,8 +1,8 @@
-import * as vscode from "vscode"
+import * as vscode from "vscode";
 import YuqueVSC from "../YuqueVSC";
-import { Repo } from "../types"
+import { Repo } from "../types";
 
-type AdvPick = vscode.QuickPickItem & { _raw: Repo }
+type AdvPick = vscode.QuickPickItem & { _raw: Repo };
 
 export const showRepoPick = (): Thenable<AdvPick | undefined> => {
 
@@ -13,9 +13,9 @@ export const showRepoPick = (): Thenable<AdvPick | undefined> => {
         description: "desc",
         detail: "detail",
         _raw: item
-      }
-    })
-  })
+      };
+    });
+  });
 
   return vscode.window.showQuickPick(quickPickItem, {
     placeHolder: "点击选择一个知识库"
@@ -25,5 +25,5 @@ export const showRepoPick = (): Thenable<AdvPick | undefined> => {
     }
 
     return selection;
-  })
-}
+  });
+};

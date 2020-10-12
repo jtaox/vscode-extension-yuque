@@ -1,4 +1,4 @@
-import * as vscode from "vscode"
+import * as vscode from "vscode";
 import { TextEncoder, TextDecoder } from "util";
 
 import YuqueVSC from "./YuqueVSC";
@@ -25,59 +25,59 @@ class MDFileSystem implements vscode.FileSystemProvider {
 
       this._onDidChangeFile.fire([
         evt
-      ])
-    })
+      ]);
+    });
 
     return { dispose: () => {
-      dispose.dispose()
+      dispose.dispose();
     } };
   }
   stat(uri: vscode.Uri): vscode.FileStat | Thenable<vscode.FileStat> {
     const { repo, slug } = parseYuqueUri(uri);
-    console.log("stat", repo, slug, uri, uri.toString())
+    console.log("stat", repo, slug, uri, uri.toString());
     return YuqueVSC.getInstance().getDoc({
       repoId: repo as string,
       slug: slug as string
     }).then(result => {
-      const { created_at, updated_at, word_count } = result.data
+      const { created_at, updated_at, word_count } = result.data;
 
       const getTime = (...dates: string[]): number[] => dates.map(date => new Date(date).getTime());
       const stat = new YuqueDocStat(word_count, getTime(created_at, updated_at));
 
-      return stat
-    })
+      return stat;
+    });
 
   }
   readDirectory(uri: vscode.Uri): [string, vscode.FileType][] | Thenable<[string, vscode.FileType][]> {
-    console.log("readDirectory")
-    throw new Error("Method not implemented.")
+    console.log("readDirectory");
+    throw new Error("Method not implemented.");
   }
   createDirectory(uri: vscode.Uri): void | Thenable<void> {
-    throw new Error("Method not implemented.")
+    throw new Error("Method not implemented.");
   }
 
   showStatusBarInfo<T>(text: string, hideWhenDone: Thenable<T>): Thenable<T> {
     this.mStatusBar.text = text;
-    this.mStatusBar.show()
+    this.mStatusBar.show();
 
     return hideWhenDone.then(value => {
-      this.mStatusBar.hide()
+      this.mStatusBar.hide();
 
       return value;
-    })
+    });
   }
 
   readFile(uri: vscode.Uri): Uint8Array | Thenable<Uint8Array> {
     const { repo, slug } = parseYuqueUri(uri);
-    console.log("readFile")
+    console.log("readFile");
     return this.showStatusBarInfo("reading yuque doc...", YuqueVSC.getInstance().getDoc({
       repoId: repo as string,
       slug: slug as string
     }).then(result => {
-      const { body } = result.data
+      const { body } = result.data;
       // string to Uint8Array
       return new TextEncoder().encode(body);
-    }))
+    }));
 
   }
   writeFile(uri: vscode.Uri, content: Uint8Array, options: { create: boolean; overwrite: boolean }): void | Thenable<void> {
@@ -93,21 +93,21 @@ class MDFileSystem implements vscode.FileSystemProvider {
       id: Number(docId),
       repoId: Number(repo)
     }).then(result => {
-      this.mStatusBar.hide()
+      this.mStatusBar.hide();
 
       return result.data.title;
     }).then(title => {
-      showInfoMessage(`保存成功`)
-    }))
+      showInfoMessage(`保存成功`);
+    }));
   }
   delete(uri: vscode.Uri, options: { recursive: boolean }): void | Thenable<void> {
-    throw new Error("Method not implemented.")
+    throw new Error("Method not implemented.");
   }
   rename(oldUri: vscode.Uri, newUri: vscode.Uri, options: { overwrite: boolean }): void | Thenable<void> {
-    throw new Error("Method not implemented.")
+    throw new Error("Method not implemented.");
   }
   public static register() {
-    const fileSystem = new MDFileSystem()
+    const fileSystem = new MDFileSystem();
     vscode.workspace.registerFileSystemProvider("yuque", fileSystem);
   }
 }
@@ -118,9 +118,9 @@ class YuqueDocStat implements vscode.FileStat {
   public type: vscode.FileType = vscode.FileType.File;
   constructor( public size: number, dates: number[]) {
     this.ctime = dates[0];
-    this.mtime = dates[1]
+    this.mtime = dates[1];
   }
   
 }
 
-export default MDFileSystem
+export default MDFileSystem;

@@ -13,19 +13,19 @@ type YuqueUriParam = {
   slug: string
   docId: number
   title: string
-}
+};
 
 type YuqueUriParseQueryResult = {
   docId: string
   title: string
   [name: string]: string
-}
+};
 
 type YuqueUriParseResult = {
   repo: string
   slug: string
   query: YuqueUriParseQueryResult
-}
+};
 
 export const buildYuqueUri = (params: YuqueUriParam) => {
   const query: { [name: string]: string } = {
@@ -52,8 +52,8 @@ export const buildYuqueUri = (params: YuqueUriParam) => {
 export const parseYuqueUri = (uri: vscode.Uri): YuqueUriParseResult => {
   const query = (qs.parse(uri.query) || {}) as YuqueUriParseQueryResult;
 
-  const pathFragmeng = uri.path.replace(/(\.yuque|\.md)$/, "").split('/')
-  pathFragmeng.shift()
+  const pathFragmeng = uri.path.replace(/(\.yuque|\.md)$/, "").split('/');
+  pathFragmeng.shift();
 
   const [repo, slug] = pathFragmeng;
 
@@ -61,5 +61,5 @@ export const parseYuqueUri = (uri: vscode.Uri): YuqueUriParseResult => {
     repo,
     slug,
     query
-  }
-}
+  };
+};

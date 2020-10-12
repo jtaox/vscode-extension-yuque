@@ -103,7 +103,7 @@
 				{
 					"command": "yuque.test",
 					"when": "view == repos-book && viewItem == doc"
-        }
+				}
 			]
 		},
 		"configuration": {
@@ -138,6 +138,7 @@
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
 		"lint": "eslint src --ext ts",
+		"lint-fix": "eslint src --ext ts --fix",
 		"watch": "tsc -watch -p ./",
 		"pretest": "npm run compile && npm run lint",
 		"test": "node ./out/test/runTest.js"

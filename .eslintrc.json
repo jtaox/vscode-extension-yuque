@@ -8,6 +8,9 @@
     "plugins": [
         "@typescript-eslint"
     ],
+    "ignorePatterns": [
+        "src/editor/*"
+    ],
     "rules": {
         "@typescript-eslint/class-name-casing": "warn",
         "@typescript-eslint/semi": "warn",

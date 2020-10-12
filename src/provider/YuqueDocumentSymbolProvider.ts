@@ -6,4 +6,4 @@ class YuqueDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
   }
 }
 
-export default YuqueDocumentSymbolProvider
+export default YuqueDocumentSymbolProvider;

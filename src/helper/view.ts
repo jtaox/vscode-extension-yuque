@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-export const showProgress = <T> (title: string, asyncFunc: (done: (msg?: string, increment?: number) => void) => Thenable<T>) => {
+export const showProgress = <T> (title: string | undefined, asyncFunc: (done: (msg?: string, increment?: number) => void) => Thenable<T>) => {
   return vscode.window.withProgress({
     cancellable: false,
     location: vscode.ProgressLocation.Notification,
@@ -9,14 +9,14 @@ export const showProgress = <T> (title: string, asyncFunc: (done: (msg?: string,
 
     const done = (message?: string, increment?: number) => {
       if (!message && !increment) {
-        increment = 100
+        increment = 100;
       }
 
       progress.report({ increment, message });
-    }
+    };
     return asyncFunc(done);
-  })
-}
+  });
+};
 
 export const showInfoMessage = (msg: string): Thenable<string | undefined> => {
   // the showInformationMessage must be manually related by the user
@@ -25,8 +25,8 @@ export const showInfoMessage = (msg: string): Thenable<string | undefined> => {
   
   return vscode.window.showInformationMessage(msg, {
     modal: false
-  })
+  });
 
   // the StatusBarMessage is too subtle.
   // return vscode.window.setStatusBarMessage(msg, 5000)
-}
+};

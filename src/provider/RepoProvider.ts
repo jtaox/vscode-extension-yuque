@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import YuQue from "../api/YuQue"
+import YuQue from "../api/YuQue";
 import {  Repo as RepoType, Doc as DocType } from '../types';
 
 export class RepoProvider implements vscode.TreeDataProvider<Serializer> {
@@ -34,15 +34,15 @@ export class RepoProvider implements vscode.TreeDataProvider<Serializer> {
 	}
 
 	getDocs(repoId?: number): Thenable<Serializer[]> {
-		if (!repoId) return Promise.resolve([]);
+		if (!repoId) {return Promise.resolve([]);}
 
 		const docs = this.yuque.Doc;
 
 		return docs.list(repoId).then(res => {
 			return res.data.map(item => {
 				item.__repoId = repoId;
-				return new Serializer(item.title, vscode.TreeItemCollapsibleState.None, item, "doc")
-			})
+				return new Serializer(item.title, vscode.TreeItemCollapsibleState.None, item, "doc");
+			});
 		});
 	}
 
@@ -52,13 +52,13 @@ export class RepoProvider implements vscode.TreeDataProvider<Serializer> {
 			type: this.type
 		}).then(res => {
 			return res.data.map(item => {
-				return new Serializer(item.name, vscode.TreeItemCollapsibleState.Collapsed, item, "repo")
-			})
-		})
+				return new Serializer(item.name, vscode.TreeItemCollapsibleState.Collapsed, item, "repo");
+			});
+		});
 	}
 }
 
-type SerializerType = "repo" | "doc"
+type SerializerType = "repo" | "doc";
 
 class Serializer extends vscode.TreeItem {
 	public command?: vscode.Command;
@@ -82,6 +82,6 @@ class Serializer extends vscode.TreeItem {
 			title: "open doc",
 			command: "yuque.openDoc",
 			arguments: [docElement],
-		}
+		};
 	}
 }

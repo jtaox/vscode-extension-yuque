@@ -3,13 +3,13 @@ import * as vscode from "vscode";
 type BaseYqConfig = {
   token: string
   login: string
-}
+};
 
 class YqExtConfig {
   private static configIns: YqExtConfig;
   public static getInstance() {
     if (!YqExtConfig.configIns) {
-      YqExtConfig.configIns = new YqExtConfig()
+      YqExtConfig.configIns = new YqExtConfig();
     }
 
     return YqExtConfig.configIns;
@@ -18,7 +18,7 @@ class YqExtConfig {
   private baseConfig!: BaseYqConfig;
 
   constructor() {
-    this.readDefaultConfig()
+    this.readDefaultConfig();
   }
 
   private readDefaultConfig(): void {
@@ -27,7 +27,7 @@ class YqExtConfig {
     this.baseConfig = {
       token,
       login
-    }
+    };
   }
 
   getBaseConfig(): BaseYqConfig {

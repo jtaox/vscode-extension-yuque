@@ -7,10 +7,10 @@ class Repo extends Requestable {
   }
 
   list(data?: any) {
-    const path: string = `/users/${this.authInfo.login}/repos`
+    const path: string = `/users/${this.authInfo.login}/repos`;
     return this.request<RepoType[]>("get", path, data);
   }
 
 }
 
-export default Repo
+export default Repo;

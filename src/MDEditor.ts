@@ -25,9 +25,9 @@ class MDEditor implements vscode.CustomTextEditorProvider {
     webviewPanel: vscode.WebviewPanel,
     token: vscode.CancellationToken
   ): void | Thenable<void> {
-    const yuqueDocUri = document.uri
+    const yuqueDocUri = document.uri;
 
-    const initBody = document.getText()
+    const initBody = document.getText();
 
     const webviewIns = webviewPanel.webview;
 
@@ -60,8 +60,8 @@ class MDEditor implements vscode.CustomTextEditorProvider {
     });
     webviewIns.onDidReceiveMessage(
       (message) => {
-        console.log(message, 'message')
-        if (message.command !== "vsc-base-markdown") return;
+        console.log(message, 'message');
+        if (message.command !== "vsc-base-markdown") {return;}
         switch (message.action) {
           case "vscBaseMarkdown.mounted":
             console.log("vscBaseMarkdown.mounted");
@@ -70,7 +70,7 @@ class MDEditor implements vscode.CustomTextEditorProvider {
           case "vscBaseMarkdown.onChange":
             // I'm not sure what the point of writing that is
             // YuqueEventTower.getIns().fireFileChangeEvent(yuqueDocUri);
-            this.updateTextDocument(document, message.text)
+            this.updateTextDocument(document, message.text);
             return;
         }
       },
@@ -94,7 +94,7 @@ class MDEditor implements vscode.CustomTextEditorProvider {
   // write doc to a given document
   private updateTextDocument(document: vscode.TextDocument, content: string) {
     const edit = new vscode.WorkspaceEdit();
-    edit.replace(document.uri, new vscode.Range(0, 0, document.lineCount, 0), content)
+    edit.replace(document.uri, new vscode.Range(0, 0, document.lineCount, 0), content);
 
     return vscode.workspace.applyEdit(edit);
   }

@@ -1,4 +1,4 @@
-import * as vscode from "vscode"
+import * as vscode from "vscode";
 
 class YuqueEventTower extends vscode.EventEmitter<vscode.FileChangeEvent> {
   private static tower: YuqueEventTower;
@@ -22,7 +22,7 @@ class YuqueEventTower extends vscode.EventEmitter<vscode.FileChangeEvent> {
     this.fire({
       uri,
       type: vscode.FileChangeType.Changed
-    })
+    });
   }
 
   public onFileChangeEvent(listener: (e: vscode.FileChangeEvent) => any): vscode.Disposable {

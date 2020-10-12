@@ -1,24 +1,24 @@
 import YuQue from "./api/YuQue";
-import BaseYqConfig from "./config"
-import { CrateDocParam, UpdateDocParam } from "./types"
+import BaseYqConfig from "./config";
+import { CrateDocParam, UpdateDocParam } from "./types";
 
 type YuqueVscConfig = {
   token: string
   login: string
-}
+};
 
 type DocInfoParam = {
   repoId: string
   slug: string
-}
+};
 
 
 class YuqueVSC {
   private static yuque: YuqueVSC;
   static getInstance(): YuqueVSC {
     if (!YuqueVSC.yuque) {
-      const baseConfig = BaseYqConfig.getInstance().getBaseConfig()
-      YuqueVSC.yuque = new YuqueVSC(baseConfig)
+      const baseConfig = BaseYqConfig.getInstance().getBaseConfig();
+      YuqueVSC.yuque = new YuqueVSC(baseConfig);
     }
 
     return YuqueVSC.yuque;
@@ -31,7 +31,7 @@ class YuqueVSC {
   }
 
   public getDoc(params: DocInfoParam) {
-    return this.yuque.Doc.get(Number(params.repoId), params.slug)
+    return this.yuque.Doc.get(Number(params.repoId), params.slug);
   }
 
   public createDoc(params: CrateDocParam) {
@@ -45,7 +45,7 @@ class YuqueVSC {
   public getRepo() {
     return this.yuque.Repo.list({
       type: "Book"
-    })
+    });
   }
 }
 

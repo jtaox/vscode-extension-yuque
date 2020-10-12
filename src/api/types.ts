@@ -1,4 +1,4 @@
-export { CrateDocParam, UpdateDocParam } from "./Doc"
+export { CrateDocParam, UpdateDocParam } from "./Doc";
 
 export type Doc = {
   id: number,
@@ -10,7 +10,7 @@ export type Doc = {
   updated_at: string,
   word_count: number,
   __repoId: number
-}
+};
 
 export type Repo = {
   id: number,
@@ -24,15 +24,15 @@ export type Repo = {
   public: 1 | 0,
   create_at: string,
   update_at: string
-}
+};
 
 export type AuthInfo = {
   token: string,
   login: string,
-}
+};
 
 export type User = {
   id: number,
   login: string,
   name: string
-}
+};
